@@ -868,6 +868,10 @@ L.Map.include({
 						'Hyperlink.URL': {
 							type: 'string',
 							value: map.makeURLFromStr(link.value)
+						},
+						'Hyperlink.Type': {
+							type: 'short',
+							value: 2
 						}
 					};
 					map.sendUnoCommand('.uno:SetHyperlink', command, true);
