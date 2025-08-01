@@ -831,6 +831,21 @@ L.Map.include({
 				labelledBy: 'hyperlink-link-box-label'
 			},
 			{
+                id: 'hyperlink-type-box-label',
+                type: 'fixedtext',
+                text: _('Type'),
+                labelFor: 'hyperlink-type-box'
+            },
+            {
+                id: "hyperlink-type-box",
+                type: "listbox",
+                labelledBy: "hyperlink-type-box-label",
+                entries: [
+                    "Text",
+                    "Button"
+                ]
+            },
+			{
 				type: 'buttonbox',
 				enabled: true,
 				children: [
