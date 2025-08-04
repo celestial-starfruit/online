@@ -830,7 +830,7 @@ L.Map.include({
 				text: defaultLink,
 				labelledBy: 'hyperlink-link-box-label'
 			},
-			{
+            {
                 id: 'hyperlink-type-box-label',
                 type: 'fixedtext',
                 text: _('Type'),
@@ -843,7 +843,11 @@ L.Map.include({
                 entries: [
                     "Text",
                     "Button"
-                ]
+                ],
+				electedCount: 1,
+				selectedEntries: [
+					"0"
+				]
             },
 			{
 				type: 'buttonbox',
@@ -870,11 +874,11 @@ L.Map.include({
 			{id: 'response-ok', func: function() {
 				var text = document.getElementById('hyperlink-text-box');
 				var link = document.getElementById('hyperlink-link-box-input');
+				var type = document.getElementById('hyperlink-type-box-input');
 
 				if (link.value != '') {
 					if (!text.value || text.value === '')
 						text.value = link.value;
-
 					var command = {
 						'Hyperlink.Text': {
 							type: 'string',
@@ -884,9 +888,12 @@ L.Map.include({
 							type: 'string',
 							value: map.makeURLFromStr(link.value)
 						},
+						// Hacky fix; value taken from enum include/svx/hlnkitem.hxx, subject to change
+						// Currently 1 for text, 2 for image, so add 1 to selected index
+						// Type, name found in core/svx/sdi/svxitems.sdi
 						'Hyperlink.Type': {
 							type: 'short',
-							value: 2
+							value: type.selectedIndex + 1
 						}
 					};
 					map.sendUnoCommand('.uno:SetHyperlink', command, true);
