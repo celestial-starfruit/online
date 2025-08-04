@@ -799,27 +799,28 @@ L.Map.include({
 		var id = 'hyperlink';
 		var title = _('Insert hyperlink');
 		var lastContext = map.uiManager.notebookbar._lastContext;
-		var insertModeButton = ['Draw', 'DrawLine', 'TextObject'].includes(lastContext);
+		var insertModeButton = ['Draw', 'DrawLine', 'TextObject', 'Graphic'].includes(lastContext);
 
-		let focusId = 'hyperlink-link-box-input';
-		if (defaultText === '') {
-			focusId = 'hyperlink-text-box';
-		}
+		console.log("context:", lastContext);
+
+		let focusId = (defaultText === '' && !insertModeButton) ? 'hyperlink-text-box' : 'hyperlink-link-box-input';
 
 		var dialogId = 'modal-dialog-' + id;
 		var json = map.uiManager._modalDialogJSON(id, title, true, [
-			{
-				id: 'hyperlink-text-box-label',
-				type: 'fixedtext',
-				text: _('Text'),
-				labelFor: 'hyperlink-text-box'
-			},
-			{
-				id: 'hyperlink-text-box',
-				type: 'multilineedit',
-				text: defaultText,
-				labelledBy: 'hyperlink-text-box-label'
-			},
+			... !insertModeButton ? [
+					{
+					id: 'hyperlink-text-box-label',
+					type: 'fixedtext',
+					text: _('Text'),
+					labelFor: 'hyperlink-text-box'
+				},
+				{
+					id: 'hyperlink-text-box',
+					type: 'multilineedit',
+					text: defaultText,
+					labelledBy: 'hyperlink-text-box-label'
+				}
+			] : [],
 			{
 				id: 'hyperlink-link-box-label',
 				type: 'fixedtext',
@@ -855,35 +856,43 @@ L.Map.include({
 
 		map.uiManager.showModal(json, [
 			{id: 'response-ok', func: function() {
-				var text = document.getElementById('hyperlink-text-box');
 				var link = document.getElementById('hyperlink-link-box-input');
 
-				if (link.value != '') {
-					if (!text.value || text.value === '')
-						text.value = link.value;
-
-					var command = {
-						'Hyperlink.Text': {
-							type: 'string',
-							value: text.value
-						},
-						'Hyperlink.URL': {
-							type: 'string',
-							value: map.makeURLFromStr(link.value)
-						},
-						// Hacky fix; value taken from enum include/svx/hlnkitem.hxx
-						// Currently 1 for text, 2 for image
-						// Type, name found in core/svx/sdi/svxitems.sdi
-						'Hyperlink.Type': {
-							type: 'short',
-							value: insertModeButton ? 2 : 1
-						}
-					};
-					map.sendUnoCommand('.uno:SetHyperlink', command, true);
+				if (link.value == '') {
+					map.uiManager.closeModal(dialogId);
+					return;
 				}
 
+				var textValue = '';
+				if (!insertModeButton) {
+					var text = document.getElementById('hyperlink-text-box');
+					textValue = text.value;
+					if (!textValue || textValue === '')
+						textValue = link.value;
+				}
+
+				var command = {
+					'Hyperlink.Text': {
+						type: 'string',
+						value: textValue
+					},
+					'Hyperlink.URL': {
+						type: 'string',
+						value: map.makeURLFromStr(link.value)
+					},
+					// Hacky fix; value taken from enum include/svx/hlnkitem.hxx
+					// Currently 1 for text, 2 for image
+					// Type, name found in core/svx/sdi/svxitems.sdi
+					'Hyperlink.Type': {
+						type: 'short',
+						value: insertModeButton ? 2 : 1
+					}
+				};
+
+				map.sendUnoCommand('.uno:SetHyperlink', command, true);
 				map.uiManager.closeModal(dialogId);
-			}}
+				}
+			}
 		]);
 	},
 
