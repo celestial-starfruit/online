@@ -794,33 +794,15 @@ L.Map.include({
 		return str;
 	},
 
-	_createAndRunHyperlinkDialog: function(defaultText, defaultLink) {
+	_createAndRunHyperlinkDialog: function() {
 		var map = this;
 		var id = 'hyperlink';
 		var title = _('Insert hyperlink');
-		var lastContext = map.uiManager.notebookbar._lastContext;
-		var insertModeButton = ['Draw', 'DrawLine', 'TextObject', 'Graphic'].includes(lastContext);
 
-		console.log("context:", lastContext);
-
-		let focusId = (defaultText === '' && !insertModeButton) ? 'hyperlink-text-box' : 'hyperlink-link-box-input';
+		let focusId = 'hyperlink-link-box-input';
 
 		var dialogId = 'modal-dialog-' + id;
 		var json = map.uiManager._modalDialogJSON(id, title, true, [
-			... !insertModeButton ? [
-					{
-					id: 'hyperlink-text-box-label',
-					type: 'fixedtext',
-					text: _('Text'),
-					labelFor: 'hyperlink-text-box'
-				},
-				{
-					id: 'hyperlink-text-box',
-					type: 'multilineedit',
-					text: defaultText,
-					labelledBy: 'hyperlink-text-box-label'
-				}
-			] : [],
 			{
 				id: 'hyperlink-link-box-label',
 				type: 'fixedtext',
@@ -830,7 +812,7 @@ L.Map.include({
 			{
 				id: 'hyperlink-link-box',
 				type: 'edit',
-				text: defaultLink,
+				text: '',
 				labelledBy: 'hyperlink-link-box-label'
 			},
 			{
@@ -863,19 +845,7 @@ L.Map.include({
 					return;
 				}
 
-				var textValue = '';
-				if (!insertModeButton) {
-					var text = document.getElementById('hyperlink-text-box');
-					textValue = text.value;
-					if (!textValue || textValue === '')
-						textValue = link.value;
-				}
-
 				var command = {
-					'Hyperlink.Text': {
-						type: 'string',
-						value: textValue
-					},
 					'Hyperlink.URL': {
 						type: 'string',
 						value: map.makeURLFromStr(link.value)
@@ -885,7 +855,7 @@ L.Map.include({
 					// Type, name found in core/svx/sdi/svxitems.sdi
 					'Hyperlink.Type': {
 						type: 'short',
-						value: insertModeButton ? 2 : 1
+						value: 2
 					}
 				};
 
@@ -905,7 +875,9 @@ L.Map.include({
 			if (map['stateChangeHandler'].getItemValue('.uno:Copy') === 'enabled') {
 				if (L.Browser.clipboardApiAvailable) {
 					// Async copy, trigger fetching the text selection.
-					app.socket.sendMessage('gettextselection mimetype=text/html,text/plain;charset=utf-8');
+					setTimeout (() => {
+						app.socket.sendMessage('gettextselection mimetype=text/html,text/plain;charset=utf-8');
+					}, 100);
 				} else {
 					text = this.extractContent(this._clip._selectionContent);
 				}
@@ -917,19 +889,14 @@ L.Map.include({
 	},
 
 	showHyperlinkDialog: function() {
-		if (this.getDocType() === 'spreadsheet') {
-			// show native core dialog
-			// in case we try to edit email EditHyperlink doesn't work
+		var lastContext = this.uiManager.notebookbar._lastContext;
+		var insertModeButton = ['Draw', 'DrawLine', 'TextObject', 'Graphic'].includes(lastContext);
+		if (!insertModeButton) {
 			this.sendUnoCommand('.uno:HyperlinkDialog');
 			return;
 		}
 
-		var text = this.getTextForLink();
-		var link = '';
-		if (this.hyperlinkUnderCursor && this.hyperlinkUnderCursor.link)
-			link = this.hyperlinkUnderCursor.link;
-
-		this._createAndRunHyperlinkDialog(text ? text.replace(/^[\n\r]+|[\n\r]+$/g, '') : '', link);
+		this._createAndRunHyperlinkDialog();
 	},
 
 	cancelSearch: function() {
