@@ -564,7 +564,7 @@ L.Control.JSDialogBuilder = L.Control.extend({
 		return false;
 	},
 
-	_getGridColumns: function(children) {
+	_getGridColumns: function(children) { //123456789
 		var columns = 0;
 		for (var index in children) {
 			if (parseInt(children[index].left) > columns)
@@ -573,7 +573,7 @@ L.Control.JSDialogBuilder = L.Control.extend({
 		return columns + 1;
 	},
 
-	_getGridRows: function(children) {
+	_getGridRows: function(children) { //123456789
 		var rows = 0;
 		for (var index in children) {
 			if (parseInt(children[index].top) > rows)
@@ -2838,7 +2838,7 @@ L.Control.JSDialogBuilder = L.Control.extend({
 		});
 	},
 
-	postProcess: function(parent, data) {
+	postProcess: function(parent, data) { //123456789
 		if (!parent || !data || !data.id || data.id === '')
 			return;
 
@@ -2882,6 +2882,7 @@ L.Control.JSDialogBuilder = L.Control.extend({
 			&& data.type !== 'spacer'
 			&& data.type !== 'edit'
 			&& data.type !== 'deck'
+			&& data.type !== 'pushbutton'
 			)
 			control.setAttribute('tabIndex', '0');
 	},
@@ -2911,7 +2912,7 @@ L.Control.JSDialogBuilder = L.Control.extend({
 		console.error('It seems widget doesn\'t require overwriting.');
 	},
 
-	build: function(parent, data, hasVerticalParent) {
+	build: function(parent, data, hasVerticalParent) { //123456789
 
 		// TODO: check and probably remove additional containers
 		if (hasVerticalParent === undefined) {
