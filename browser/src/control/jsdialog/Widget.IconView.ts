@@ -105,6 +105,10 @@ function _iconViewEntry(
 		else if (entry.text) placeholder.title = entry.text;
 		else placeholder.title = '';
 
+		entryContainer.style.width = entry.width + 'px';
+		entryContainer.style.height = entry.height + 'px';
+		entryContainer.style.overflow = 'hidden';
+
 		// Add tabindex attribute for accessibility, enabling keyboard navigation in the icon preview
 		entryContainer.setAttribute('tabindex', '0');
 		JSDialog.OnDemandRenderer(
