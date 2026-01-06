@@ -2442,6 +2442,7 @@ window.L.Control.JSDialogBuilder = window.L.Control.extend({
 		control.replaceWith(temporaryParent.firstChild)
 
 		var newControl = container.querySelector('[id=\'' + elementId + '\']');
+		control.replacedBy = newControl;
 		if (newControl) {
 			newControl.scrollTop = scrollTop;
 			newControl.style.gridColumn = backupGridColSpan;
