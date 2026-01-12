@@ -2439,25 +2439,35 @@ window.L.Control.JSDialogBuilder = window.L.Control.extend({
 		var backupGridColSpan = control.style.gridColumn;
 		var backupGridRowSpan = control.style.gridRow;
 
-		control.replaceWith(temporaryParent.firstChild)
+		let whenReady = () => {
+			control.replaceWith(temporaryParent.firstChild)
 
-		var newControl = container.querySelector('[id=\'' + elementId + '\']');
-		if (newControl) {
-			newControl.scrollTop = scrollTop;
-			newControl.style.gridColumn = backupGridColSpan;
-			newControl.style.gridRow = backupGridRowSpan;
+			var newControl = container.querySelector('[id=\'' + elementId + '\']');
+			if (newControl) {
+				newControl.scrollTop = scrollTop;
+				newControl.style.gridColumn = backupGridColSpan;
+				newControl.style.gridRow = backupGridRowSpan;
 
-			// todo: is that needed? should be in widget impl?
-			if (data.has_default === true && (data.type === 'pushbutton' || data.type === 'okbutton')) {
-				const buttonNode = newControl.querySelector('button');
-				if (buttonNode) window.L.DomUtil.addClass(buttonNode, 'button-primary');
+				// todo: is that needed? should be in widget impl?
+				if (data.has_default === true && (data.type === 'pushbutton' || data.type === 'okbutton')) {
+					const buttonNode = newControl.querySelector('button');
+					if (buttonNode) window.L.DomUtil.addClass(buttonNode, 'button-primary');
+				}
+			}
+
+			if (focusedId) {
+				var found = container.querySelector('[id=\'' + focusedId + '\']');
+				if (found)
+					found.focus();
 			}
 		}
 
-		if (focusedId) {
-			var found = container.querySelector('[id=\'' + focusedId + '\']');
-			if (found)
-				found.focus();
+		if (temporaryParent.firstChild.firstChild && temporaryParent.firstChild.firstChild.complete === false) {
+			temporaryParent.firstChild.firstChild.onload = () => {
+				whenReady();
+			};
+		} else {
+			whenReady();
 		}
 	},
 
