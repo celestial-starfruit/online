@@ -2440,6 +2440,7 @@ window.L.Control.JSDialogBuilder = window.L.Control.extend({
 		var backupGridRowSpan = control.style.gridRow;
 
 		control.replaceWith(temporaryParent.firstChild)
+		control.oldParent = parent;
 
 		var newControl = container.querySelector('[id=\'' + elementId + '\']');
 		if (newControl) {

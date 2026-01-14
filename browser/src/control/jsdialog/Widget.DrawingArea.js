@@ -31,7 +31,7 @@ function _drawingAreaControl (parentContainer, data, builder) {
 
 	container.getCurrent = function () {
 		if (container.id == "") {
-			return document.getElementById(data.id);
+			return container.oldParent.querySelector("#" + data.id);
 		} else {
 			return container;
 		}
